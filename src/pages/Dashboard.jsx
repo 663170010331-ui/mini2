@@ -80,7 +80,6 @@ function Dashboard() {
     const errors = {};
 
     if (activeTab === "teachers") {
-      // Validate Username
       if (!formData.username || !formData.username.trim()) {
         errors.username = "กรุณากรอกชื่อผู้ใช้งาน";
       } else if (formData.username.length < 3) {
@@ -89,14 +88,12 @@ function Dashboard() {
         errors.username = "ชื่อผู้ใช้ต้องเป็นตัวอักษร ตัวเลข และ _ เท่านั้น";
       }
 
-      // Validate Password
       if (!formData.password || !formData.password.trim()) {
         errors.password = "กรุณากรอกรหัสผ่าน";
       } else if (formData.password.length < 4) {
         errors.password = "รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร";
       }
 
-      // Validate Fullname
       if (!formData.fullname || !formData.fullname.trim()) {
         errors.fullname = "กรุณากรอกชื่อ-นามสกุล";
       } else if (formData.fullname.trim().length < 3) {
@@ -105,40 +102,39 @@ function Dashboard() {
         errors.fullname = "ชื่อ-นามสกุลต้องเป็นตัวอักษรไทยหรืออังกฤษเท่านั้น";
       }
 
-      // Validate Tel
       if (!formData.tel || !formData.tel.trim()) {
         errors.tel = "กรุณากรอกเบอร์โทรศัพท์";
       } else if (!/^0\d{9}$/.test(formData.tel)) {
         errors.tel = "เบอร์โทรศัพท์ไม่ถูกต้อง (ต้องขึ้นต้นด้วย 0 และมี 10 หลัก)";
       }
     } else if (activeTab === "subjects") {
-      // Validate Course ID
       if (!formData.course_id || !formData.course_id.trim()) {
         errors.course_id = "กรุณากรอกรหัสวิชา";
       } else if (formData.course_id.length < 2) {
         errors.course_id = "รหัสวิชาต้องมีอย่างน้อย 2 ตัวอักษร";
       }
 
-      // Validate Course Name
       if (!formData.course_name || !formData.course_name.trim()) {
         errors.course_name = "กรุณากรอกชื่อวิชา";
       } else if (formData.course_name.trim().length < 3) {
         errors.course_name = "ชื่อวิชาต้องมีอย่างน้อย 3 ตัวอักษร";
       }
 
-      // Validate Teacher Name
       if (!formData.teacher_name || !formData.teacher_name.trim()) {
         errors.teacher_name = "กรุณากรอกชื่ออาจารย์ผู้สอน";
       }
+
+      // ✅ validate time_check
+      if (!formData.time_check || !formData.time_check.trim()) {
+        errors.time_check = "กรุณากรอกเวลาเริ่มเช็คชื่อ";
+      }
     } else if (activeTab === "students") {
-      // Validate Fullname
       if (!formData.fullname || !formData.fullname.trim()) {
         errors.fullname = "กรุณากรอกชื่อ-นามสกุล";
       } else if (formData.fullname.trim().length < 3) {
         errors.fullname = "ชื่อ-นามสกุลต้องมีอย่างน้อย 3 ตัวอักษร";
       }
 
-      // Validate Major
       if (!formData.major || !formData.major.trim()) {
         errors.major = "กรุณากรอกสาขาวิชา";
       }
@@ -188,20 +184,15 @@ function Dashboard() {
   };
 
   const handleSave = async () => {
-    // Clear errors
     setError("");
     setFieldErrors({});
 
-    // Validate
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setSaving(true);
 
     let api = "";
     if (editingItem) {
-      // Update
       if (activeTab === "students") {
         api = `/students/${formData?.student_id}`;
       } else if (activeTab === "teachers") {
@@ -210,7 +201,6 @@ function Dashboard() {
         api = `/update-subject/${formData?.course_id}`;
       }
     } else {
-      // Create
       if (activeTab === "teachers") {
         api = "/create-professor";
       } else {
@@ -272,62 +262,34 @@ function Dashboard() {
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-8 mt-20">
-        {/* Welcome Section */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">
-            ยินดีต้อนรับ, Admin
-          </h2>
-          <p className="text-gray-600">
-            จัดการข้อมูลนักศึกษา อาจารย์ และรายวิชา
-          </p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">ยินดีต้อนรับ, Admin</h2>
+          <p className="text-gray-600">จัดการข้อมูลนักศึกษา อาจารย์ และรายวิชา</p>
         </div>
 
-        {/* Stats Grid */}
         <DashboardStat />
 
-        {/* Management Section */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-gray-200 bg-gray-50">
-            <button
-              onClick={() => setActiveTab("students")}
-              className={`flex-1 py-4 px-6 font-semibold transition-all ${
-                activeTab === "students"
-                  ? "bg-white text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <GraduationCap className="w-5 h-5" />
-                นักศึกษา
-              </div>
-            </button>
-            <button
-              onClick={() => setActiveTab("teachers")}
-              className={`flex-1 py-4 px-6 font-semibold transition-all ${
-                activeTab === "teachers"
-                  ? "bg-white text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <User className="w-5 h-5" />
-                อาจารย์
-              </div>
-            </button>
-            <button
-              onClick={() => setActiveTab("subjects")}
-              className={`flex-1 py-4 px-6 font-semibold transition-all ${
-                activeTab === "subjects"
-                  ? "bg-white text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <BookOpen className="w-5 h-5" />
-                รายวิชา
-              </div>
-            </button>
+            {["students", "teachers", "subjects"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 py-4 px-6 font-semibold transition-all ${
+                  activeTab === tab
+                    ? "bg-white text-blue-600 border-b-2 border-blue-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  {tab === "students" && <GraduationCap className="w-5 h-5" />}
+                  {tab === "teachers" && <User className="w-5 h-5" />}
+                  {tab === "subjects" && <BookOpen className="w-5 h-5" />}
+                  {tab === "students" ? "นักศึกษา" : tab === "teachers" ? "อาจารย์" : "รายวิชา"}
+                </div>
+              </button>
+            ))}
           </div>
 
           {/* Toolbar */}
@@ -362,70 +324,47 @@ function Dashboard() {
                 <tr>
                   {activeTab === "students" && (
                     <>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        รหัสนักศึกษา
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        ชื่อ-นามสกุล
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        สาขาวิชา
-                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">รหัสนักศึกษา</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">ชื่อ-นามสกุล</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">สาขาวิชา</th>
                     </>
                   )}
                   {activeTab === "teachers" && (
                     <>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        รหัสอาจารย์
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        ชื่อ-นามสกุล
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        เบอร์โทรศัพท์
-                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">รหัสอาจารย์</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">ชื่อ-นามสกุล</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">เบอร์โทรศัพท์</th>
                     </>
                   )}
                   {activeTab === "subjects" && (
                     <>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        รหัสวิชา
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        ชื่อวิชา
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                        อาจารย์ผู้สอน
-                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">รหัสวิชา</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">ชื่อวิชา</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">อาจารย์ผู้สอน</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">เวลาเช็คชื่อ</th>{/* ✅ */}
                     </>
                   )}
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
-                    จัดการ
-                  </th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">จัดการ</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="4" className="px-6 py-12 text-center">
+                    <td colSpan="5" className="px-6 py-12 text-center">
                       <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                       <p className="text-gray-500">ไม่พบข้อมูล</p>
                     </td>
                   </tr>
                 ) : (
                   filteredData.map((item, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      {activeTab === "students" && (
-                        <DashboardStudentRow item={item} />
-                      )}
-                      {activeTab === "teachers" && (
-                        <DashboardProfessorRow item={item} />
-                      )}
+                    <tr key={index} className="hover:bg-gray-50 transition-colors">
+                      {activeTab === "students" && <DashboardStudentRow item={item} />}
+                      {activeTab === "teachers" && <DashboardProfessorRow item={item} />}
                       {activeTab === "subjects" && (
-                        <DashboardSubjectRow item={item} />
+                        <>
+                          <DashboardSubjectRow item={item} />
+                          <td className="px-6 py-4 text-gray-700">{item.time_check || "-"}</td>{/* ✅ */}
+                        </>
                       )}
                       <td className="px-6 py-4">
                         <div className="flex justify-center gap-2">
@@ -450,12 +389,9 @@ function Dashboard() {
             </table>
           </div>
 
-          {/* Footer */}
           {filteredData.length > 0 && (
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
-                แสดง {filteredData.length} รายการ
-              </p>
+              <p className="text-sm text-gray-600">แสดง {filteredData.length} รายการ</p>
             </div>
           )}
         </div>
@@ -470,11 +406,7 @@ function Dashboard() {
                 {editingItem ? "แก้ไขข้อมูล" : "เพิ่มข้อมูล"}
               </h3>
               <button
-                onClick={() => {
-                  setShowModal(false);
-                  setFieldErrors({});
-                  setError("");
-                }}
+                onClick={() => { setShowModal(false); setFieldErrors({}); setError(""); }}
                 className="p-1 hover:bg-white hover:bg-opacity-20 rounded-lg transition-all"
               >
                 <X className="w-6 h-6" />
@@ -491,86 +423,32 @@ function Dashboard() {
 
               {activeTab === "teachers" && (
                 <>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      ชื่อผู้ใช้งาน <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.username || ""}
-                      onChange={(e) => handleInputChange("username", e.target.value)}
-                      className={`w-full px-4 py-3 bg-gray-50 border ${
-                        fieldErrors.username ? "border-red-300" : "border-gray-200"
-                      } rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all`}
-                      placeholder="teacher01"
-                    />
-                    {fieldErrors.username && (
-                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {fieldErrors.username}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      รหัสผ่าน <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.password || ""}
-                      onChange={(e) => handleInputChange("password", e.target.value)}
-                      className={`w-full px-4 py-3 bg-gray-50 border ${
-                        fieldErrors.password ? "border-red-300" : "border-gray-200"
-                      } rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all`}
-                      placeholder="teacher1234"
-                    />
-                    {fieldErrors.password && (
-                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {fieldErrors.password}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      ชื่อ-นามสกุล <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.fullname || ""}
-                      onChange={(e) => handleInputChange("fullname", e.target.value)}
-                      className={`w-full px-4 py-3 bg-gray-50 border ${
-                        fieldErrors.fullname ? "border-red-300" : "border-gray-200"
-                      } rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all`}
-                      placeholder="อาจารย์สมชาย"
-                    />
-                    {fieldErrors.fullname && (
-                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {fieldErrors.fullname}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      เบอร์โทรศัพท์ <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      value={formData.tel || ""}
-                      onChange={(e) => handleInputChange("tel", e.target.value)}
-                      className={`w-full px-4 py-3 bg-gray-50 border ${
-                        fieldErrors.tel ? "border-red-300" : "border-gray-200"
-                      } rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all`}
-                      placeholder="0812345678"
-                    />
-                    {fieldErrors.tel && (
-                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {fieldErrors.tel}
-                      </p>
-                    )}
-                  </div>
+                  {[
+                    { field: "username", label: "ชื่อผู้ใช้งาน", placeholder: "teacher01" },
+                    { field: "password", label: "รหัสผ่าน", placeholder: "teacher1234" },
+                    { field: "fullname", label: "ชื่อ-นามสกุล", placeholder: "อาจารย์สมชาย" },
+                    { field: "tel", label: "เบอร์โทรศัพท์", placeholder: "0812345678", type: "tel" },
+                  ].map(({ field, label, placeholder, type = "text" }) => (
+                    <div key={field}>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        {label} <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type={type}
+                        value={formData[field] || ""}
+                        onChange={(e) => handleInputChange(field, e.target.value)}
+                        className={`w-full px-4 py-3 bg-gray-50 border ${
+                          fieldErrors[field] ? "border-red-300" : "border-gray-200"
+                        } rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all`}
+                        placeholder={placeholder}
+                      />
+                      {fieldErrors[field] && (
+                        <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" /> {fieldErrors[field]}
+                        </p>
+                      )}
+                    </div>
+                  ))}
                 </>
               )}
 
@@ -592,11 +470,11 @@ function Dashboard() {
                     />
                     {fieldErrors.course_id && (
                       <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {fieldErrors.course_id}
+                        <AlertCircle className="w-4 h-4" /> {fieldErrors.course_id}
                       </p>
                     )}
                   </div>
+
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       ชื่อวิชา <span className="text-red-500">*</span>
@@ -612,11 +490,11 @@ function Dashboard() {
                     />
                     {fieldErrors.course_name && (
                       <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {fieldErrors.course_name}
+                        <AlertCircle className="w-4 h-4" /> {fieldErrors.course_name}
                       </p>
                     )}
                   </div>
+
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       อาจารย์ผู้สอน <span className="text-red-500">*</span>
@@ -625,11 +503,9 @@ function Dashboard() {
                       value={formData.teacher_id || ""}
                       onChange={(e) => {
                         const teacherId = e.target.value;
-                        const teacher = teachers.find(t => t.id == teacherId);
+                        const teacher = teachers.find((t) => t.id == teacherId);
                         handleInputChange("teacher_id", teacherId);
-                        if (teacher) {
-                          handleInputChange("teacher_name", teacher.fullname);
-                        }
+                        if (teacher) handleInputChange("teacher_name", teacher.fullname);
                       }}
                       className={`w-full px-4 py-3 bg-gray-50 border ${
                         fieldErrors.teacher_name ? "border-red-300" : "border-gray-200"
@@ -637,15 +513,32 @@ function Dashboard() {
                     >
                       <option value="">เลือกอาจารย์</option>
                       {teachers.map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {t.fullname}
-                        </option>
+                        <option key={t.id} value={t.id}>{t.fullname}</option>
                       ))}
                     </select>
                     {fieldErrors.teacher_name && (
                       <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {fieldErrors.teacher_name}
+                        <AlertCircle className="w-4 h-4" /> {fieldErrors.teacher_name}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* ✅ เพิ่ม input time_check */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      เวลาเริ่มเช็คชื่อ <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="time"
+                      value={formData.time_check || ""}
+                      onChange={(e) => handleInputChange("time_check", e.target.value)}
+                      className={`w-full px-4 py-3 bg-gray-50 border ${
+                        fieldErrors.time_check ? "border-red-300" : "border-gray-200"
+                      } rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all`}
+                    />
+                    {fieldErrors.time_check && (
+                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" /> {fieldErrors.time_check}
                       </p>
                     )}
                   </div>
@@ -655,69 +548,45 @@ function Dashboard() {
               {activeTab === "students" && (
                 <>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      รหัสนักศึกษา
-                    </label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">รหัสนักศึกษา</label>
                     <input
                       type="text"
                       value={formData.std_class_id || ""}
                       readOnly
                       className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl cursor-not-allowed"
                     />
-                    <p className="text-xs text-gray-500 mt-2">
-                      * ไม่สามารถแก้ไขรหัสนักศึกษาได้
-                    </p>
+                    <p className="text-xs text-gray-500 mt-2">* ไม่สามารถแก้ไขรหัสนักศึกษาได้</p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      ชื่อ-นามสกุล <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.fullname || ""}
-                      onChange={(e) => handleInputChange("fullname", e.target.value)}
-                      className={`w-full px-4 py-3 bg-gray-50 border ${
-                        fieldErrors.fullname ? "border-red-300" : "border-gray-200"
-                      } rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all`}
-                      placeholder="นายสมชาย ใจดี"
-                    />
-                    {fieldErrors.fullname && (
-                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {fieldErrors.fullname}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      สาขาวิชา <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.major || ""}
-                      onChange={(e) => handleInputChange("major", e.target.value)}
-                      className={`w-full px-4 py-3 bg-gray-50 border ${
-                        fieldErrors.major ? "border-red-300" : "border-gray-200"
-                      } rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all`}
-                      placeholder="วิทยาการคอมพิวเตอร์"
-                    />
-                    {fieldErrors.major && (
-                      <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {fieldErrors.major}
-                      </p>
-                    )}
-                  </div>
+                  {[
+                    { field: "fullname", label: "ชื่อ-นามสกุล", placeholder: "นายสมชาย ใจดี" },
+                    { field: "major", label: "สาขาวิชา", placeholder: "วิทยาการคอมพิวเตอร์" },
+                  ].map(({ field, label, placeholder }) => (
+                    <div key={field}>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        {label} <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData[field] || ""}
+                        onChange={(e) => handleInputChange(field, e.target.value)}
+                        className={`w-full px-4 py-3 bg-gray-50 border ${
+                          fieldErrors[field] ? "border-red-300" : "border-gray-200"
+                        } rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all`}
+                        placeholder={placeholder}
+                      />
+                      {fieldErrors[field] && (
+                        <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" /> {fieldErrors[field]}
+                        </p>
+                      )}
+                    </div>
+                  ))}
                 </>
               )}
 
               <div className="flex gap-3 pt-4">
                 <button
-                  onClick={() => {
-                    setShowModal(false);
-                    setFieldErrors({});
-                    setError("");
-                  }}
+                  onClick={() => { setShowModal(false); setFieldErrors({}); setError(""); }}
                   className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all font-medium"
                   disabled={saving}
                 >
